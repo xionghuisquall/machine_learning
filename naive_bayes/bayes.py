@@ -25,3 +25,11 @@ def setOfWords2Vec(vocabList, inputSet):
             print "the word: %s is not in my Voabulary!" % word
     return returnVec
 
+def trainNB0(trainMatrix, trainCategory):
+    numTrainDocs = 
+
+listOPosts, listClasses = loadDataSet()
+myVocabList = createVocabList(listOPosts)
+print myVocabList
+
+print setOfWords2Vec(myVocabList, listOPosts[0])
