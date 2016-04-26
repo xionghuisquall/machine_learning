@@ -25,11 +25,97 @@ def setOfWords2Vec(vocabList, inputSet):
             print "the word: %s is not in my Voabulary!" % word
     return returnVec
 
-def trainNB0(trainMatrix, trainCategory):
-    numTrainDocs = 
 
+def trainNB0(trainMatrix, trainCategory):
+    numTrainDocs = len(trainMatrix)
+    numWords = len(trainMatrix[0])
+    pAbusive = sum(trainCategory) / float(numTrainDocs)
+    p0Num = zeros(numWords)
+    p1Num = zeros(numWords)
+    p0Denum = 0.0
+    p1Denum = 0.0
+    for i in range(numTrainDocs):
+        if trainCategory[i] == 1:
+            p1Num += trainMatrix[i]
+            p1Denum += sum(trainMatrix[i])
+        else:
+            p0Num += trainMatrix[i]
+            p0Denum += sum(trainMatrix[i])
+
+    p1Vect = p1Num / p1Denum
+    p0Vect = p0Num / p0Denum
+
+    return p0Vect, p1Vect, pAbusive
+
+def trainNB1(trainMatrix, trainCategory):
+    numTrainDocs = len(trainMatrix)
+    numWords = len(trainMatrix[0])
+    pAbusive = sum(trainCategory) / float(numTrainDocs)
+    p0Num = ones(numWords);
+    p1Num = ones(numWords);
+    p0Denom = 2.0;
+    p1Denom = 2.0;
+    for i in range(numTrainDocs):
+        if trainCategory[i] == 1:
+            p1Num += trainMatrix[i]
+            p1Denom += sum(trainMatrix[i])
+        else:
+            p0Num += trainMatrix[i]
+            p0Denom += sum(trainMatrix[i])
+    p1Vect = log(p1Num / p1Denom)
+    p0Vect = log(p0Num / p0Denom)
+    return p0Vect, p1Vect, pAbusive
+
+def classifyNB(vec2Classify, p0Vec, p1Vec, pClass1):
+   # print 'in classifyNB', sum(vec2Classify * p1Vec)
+
+    p1 = sum(vec2Classify * p1Vec) + log(pClass1)
+    p0 = sum(vec2Classify * p0Vec) + log(1 - pClass1)
+    if p1 > p0:
+        return 1
+    else:
+        return 0
+
+def testingNB():
+    listOPosts, listClasses = loadDataSet()
+    myVocabList = createVocabList(listOPosts)
+
+    trainMat = []
+    for postinDoc in listOPosts:
+        trainMat.append(setOfWords2Vec(myVocabList, postinDoc))
+
+    p0V, p1V, pAb = trainNB1(trainMat, listClasses)
+
+    testEntry = ['love', 'my', 'dalmation']
+    thisDoc = array(setOfWords2Vec(myVocabList, testEntry))
+    # classifyNB(thisDoc, p0V, p1V, pAb)
+
+    #thisDoc = setOfWords2Vec(myVocabList, testEntry)
+    #classifyNB(thisDoc, p0V, p1V, pAb)
+
+    # print setOfWords2Vec(myVocabList, testEntry)
+    # print thisDoc
+    print testEntry, 'classified as: ', classifyNB(thisDoc, p0V, p1V, pAb)
+
+    testEntry = ['stupid', 'garbage']
+    thisDoc = array(setOfWords2Vec(myVocabList, testEntry))
+    print  testEntry, 'classifed as: ', classifyNB(thisDoc, p0V, p1V, pAb)
+
+testingNB()
+
+'''
 listOPosts, listClasses = loadDataSet()
 myVocabList = createVocabList(listOPosts)
 print myVocabList
 
 print setOfWords2Vec(myVocabList, listOPosts[0])
+
+trainMat = []
+for postinDoc in listOPosts:
+    trainMat.append(setOfWords2Vec(myVocabList, postinDoc))
+
+p0V, p1V, pAb = trainNB0(trainMat, listClasses)
+print p0V
+print p1V
+print pAb
+'''
