@@ -8,3 +8,5 @@ print(sys.executable)
 randMat = mat(random.rand(4,4))
 print(randMat)
 print(randMat.I)
+
+
