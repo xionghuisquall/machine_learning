@@ -13,7 +13,8 @@ import numpy
 from six.moves import urllib
 from six.moves import xrange  # pylint: disable=redefined-builtin
 import tensorflow as tf
-import  tensorflow.examples.tutorials.mnist.input_data
+# import  tensorflow.examples.tutorials.mnist.input_data
+from tensorflow.examples.tutorials.mnist import input_data
 
 SOURCE_URL = 'http://yann.lecun.com/exdb/mnist/'
 WORK_DIRECTORY = 'data'
@@ -100,31 +101,47 @@ print(test_data.shape[0])
 # Generate a validation set.
 validation_data = train_data[:VALIDATION_SIZE, ...]
 validation_labels = train_labels[:VALIDATION_SIZE]
-train_data = train_data[VALIDATION_SIZE:, ...]
-train_labels = train_labels[VALIDATION_SIZE:]
+# train_data = train_data[VALIDATION_SIZE:, ...]
+# train_labels = train_labels[VALIDATION_SIZE:]
 
-x = tf.placeholder("float", [None, 784])
+mnist = input_data.read_data_sets('/tmp/tensorflow/mnist/input_data', one_hot=True)
+
+x = tf.placeholder(tf.float32, [None, 784])
 W = tf.Variable(tf.zeros([784, 10]))
 b = tf.Variable(tf.zeros([10]))
-y = tf.nn.softmax(tf.matmul(x, W) + b)
+# y = tf.nn.softmax(tf.matmul(x, W) + b)
+y = tf.matmul(x, W) + b
 
-y_ = tf.placeholder("float", [None, 10])
-cross_entropy = - tf.reduce_sum(y_ * tf.log(y))
 
-step = tf.train.GradientDescentOptimizer(0.01).minimize(cross_entropy)
+y_ = tf.placeholder(tf.float32, [None, 10])
+
+# cross_entropy = - tf.reduce_sum(y_ * tf.log(y))
+cross_entropy = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=y_, logits=y))
+
+step = tf.train.GradientDescentOptimizer(0.5).minimize(cross_entropy)
 
 init = tf.global_variables_initializer()
 
 sess = tf.Session()
 sess.run(init)
 
+'''
 size = train_data.shape[0]
-for begin in range(0, size, 60):
-    end = begin + 60
+for begin in range(0, size, 100):
+    end = begin + 100
+    print(str(begin) + ', ' + str(end))
     sess.run(step, feed_dict={x:train_data[begin:end, ...], y_:train_labels[begin:end, ...]})
+'''
 
-    correct_prediction = tf.equal(tf.argmax(y, 1), tf.argmax(y_, 1))
-    accuracy = tf.reduce_mean(tf.cast(correct_prediction, 'float'))
 
-    error_rate = sess.run(accuracy, feed_dict={x: test_data, y_:test_labels})
-    print(error_rate)
+for _ in range(1000):
+    batch_xs, batch_ys = mnist.train.next_batch(100)
+    sess.run(step, feed_dict={x: batch_xs, y_: batch_ys})
+
+
+correct_prediction = tf.equal(tf.argmax(y, 1), tf.argmax(y_, 1))
+accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+
+#error_rate = sess.run(accuracy, feed_dict={x: test_data, y_:test_labels})
+error_rate = sess.run(accuracy, feed_dict={x: mnist.test.images, y_:mnist.test.labels})
+print(error_rate)
