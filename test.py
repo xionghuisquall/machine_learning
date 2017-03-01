@@ -13,3 +13,5 @@ print(weights)
 print(zip(sizes[:-1], sizes[1:]))
 
 print np.random.randn(2,3,4)
+
+print zip(biases, weights)
