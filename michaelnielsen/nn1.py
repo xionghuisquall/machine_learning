@@ -16,10 +16,38 @@ class Network(object):
 
     def forward(self, a):
         for (b, w) in zip(self.biases, self.weights):
-            a = self.sigmod(np.dot(w, a) + b)
+            a = sigmoid(np.dot(w, a) + b)
         return a
 
-    def backprop(self):
+    def backprop(self, x, y):
+        a = x
+
+        zs = []
+        zds = []
+        acts = []
+        for (b, w) in zip(self.biases, self.weights):
+            z = np.dot(w, a) + b
+            zs.append(z)
+
+            act = sigmoid(z)
+            acts.append(act)
+
+            zd = sigmoid_prime(z)
+            zds.append(zd)
+
+        theta_n = (acts[-1] - y) * zds[-1]
+        thetas = [theta_n]
+
+        bs = []
+        for l in xrange(2, self.num_layers):
+            theta = np.dot(self.weights[-l + 1].transpose(), thetas[-l + 1]) * zds[-l]
+            thetas[-l] = theta
+
+            bd = theta
+            wd = np.dot(theta, acts[-l - 1].transpose())
+
+
+        print ''
 
 def sigmoid(z):
     return 1.0 / (1.0 + np.exp(-z))

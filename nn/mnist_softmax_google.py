@@ -26,7 +26,7 @@ import argparse
 import sys
 
 
-
+from tensorflow.examples.tutorials.mnist import input_data
 
 import tensorflow as tf
 
@@ -63,7 +63,7 @@ def main(_):
   tf.global_variables_initializer().run()
   # Train
   for _ in range(1000):
-    batch_xs, batch_ys = mnist.train.next_batch(100)
+    batch_xs, batch_ys = mnist.train.next_batch(100, shuffle=False)
     sess.run(train_step, feed_dict={x: batch_xs, y_: batch_ys})
 
   # Test trained model

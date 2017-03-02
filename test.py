@@ -12,6 +12,10 @@ print(weights)
 
 print(zip(sizes[:-1], sizes[1:]))
 
-print np.random.randn(2,3,4)
+# print np.random.randn(2,3,4)
 
-print zip(biases, weights)
+# print zip(biases, weights)
+
+print weights[0]
+print weights[0].transpose()
+print np.dot(weights[0].transpose(), [1, 2, 4])
