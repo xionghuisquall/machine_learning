@@ -1,6 +1,7 @@
 import random
 import numpy as np
 
+# stochastic gradient descent + mini-batch, backpropagation
 class Network(object):
 
     def __init__(self, sizes):
