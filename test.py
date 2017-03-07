@@ -18,4 +18,7 @@ print(zip(sizes[:-1], sizes[1:]))
 
 print weights[0]
 print weights[0].transpose()
-print np.dot(weights[0].transpose(), [1, 2, 4])
+
+theta = np.dot(weights[0].transpose(), [1, 2, 4])
+
+print np.dot(theta, [1, 2, 4].transpose())

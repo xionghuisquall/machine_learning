@@ -4,6 +4,7 @@ import numpy as np
 class Network(object):
 
     def __init__(self, sizes):
+        # assume the first layer is input layer
         self.num_layers = len(sizes)
         self.sizes = sizes
         self.biases = [np.random.randn(y, 1) for y in sizes[1:]]
@@ -20,6 +21,9 @@ class Network(object):
         return a
 
     def backprop(self, x, y):
+        nabla_b = [np.zeros(b.shape) for b in self.biases]
+        nabla_w = [np.zeros(w.shape) for w in self.weights]
+
         a = x
 
         zs = []
@@ -38,16 +42,20 @@ class Network(object):
         theta_n = (acts[-1] - y) * zds[-1]
         thetas = [theta_n]
 
-        bs = []
+        nabla_b[-1] = theta_n
+        nabla_w[-1] = np.dot(theta_n, acts[-2].transpose())
+
         for l in xrange(2, self.num_layers):
             theta = np.dot(self.weights[-l + 1].transpose(), thetas[-l + 1]) * zds[-l]
             thetas[-l] = theta
 
-            bd = theta
-            wd = np.dot(theta, acts[-l - 1].transpose())
+            nabla_b[-l] = theta
+            nabla_w[-l] = np.dot(theta, acts[-l - 1].transpose())
 
 
-        print ''
+        return (nabla_b, nabla_w)
+
+
 
 def sigmoid(z):
     return 1.0 / (1.0 + np.exp(-z))
