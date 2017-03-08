@@ -56,6 +56,37 @@ class Network(object):
 
         return (nabla_b, nabla_w)
 
+    def update_mini_batch(self, batch, eta):
+        nabla_b = [np.zeros(b.shape) for b in self.biases]
+        nabla_w = [np.zeros(w.shape) for w in self.weights]
+
+        for (x, y) in batch:
+            b, w = self.backprop(x, y)
+            nabla_b = [nb + db for (nb, db) in zip(nabla_b, b)]
+            nabla_w = [nw + dw for (nw, dw) in zip(nabla_w, w)]
+
+        self.weights = [w - (eta / len(batch)) * nw for w, nw in zip(self.weights, nabla_w)]
+        self.biases = [b - (eta / len(batch)) * nb for b, nb in zip(self.biases, nabla_b)]
+
+    def SGD(self, training_data, epochs, mini_batch_size, eta, testing_data = None):
+        if testing_data:
+            n_test = len(testing_data)
+
+        n = len(training_data)
+        for i in xrange(epochs):
+            random.shuffle(training_data)
+
+            mini_batches = [training_data[k : k + mini_batch_size] for k in xrange(0, n, mini_batch_size)]
+
+            for mini_batch in mini_batches:
+                self.update_mini_batch(mini_batch, eta)
+
+            if testing_data:
+                print "Epoch {0}: {1} / {2}".format(i, n_test)
+            else:
+                print "Epoch {0} completed".format(i)
+
+
 
 
 def sigmoid(z):
