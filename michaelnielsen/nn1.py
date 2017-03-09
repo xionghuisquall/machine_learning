@@ -1,5 +1,6 @@
 import random
 import numpy as np
+import mnist_loader
 
 # stochastic gradient descent + mini-batch, backpropagation
 class Network(object):
@@ -82,21 +83,33 @@ class Network(object):
                 self.update_mini_batch(mini_batch, eta)
 
             if testing_data:
-                print "Epoch {0}: {1} / {2}".format(i, n_test)
+                print "Epoch {0}: {1} / {2}".format(i,self.evaluate(testing_data), n_test)
             else:
                 print "Epoch {0} completed".format(i)
 
-
+    def evaluate(self, test_data):
+        test_results = [(np.argmax(self.forward(x)), y) for (x, y) in test_data]
+        return sum(int(x == y) for (x, y) in test_results)
 
 
 def sigmoid(z):
     return 1.0 / (1.0 + np.exp(-z))
 
+
 def sigmoid_prime(z):
     return sigmoid(z) * (1 - sigmoid(z))
+
 
 def cost_derivate(output_activation, y):
     return output_activation - y
 
 
 
+def run():
+    training_data, validation_data, test_data = mnist_loader.load_data_wrapper()
+    net = Network([784, 30, 10])
+    net.SGD(training_data, 30, 10, 3.0, test_data)
+
+
+if __name__ == "__main__":
+    run()
