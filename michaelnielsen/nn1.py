@@ -26,13 +26,13 @@ class Network(object):
         nabla_b = [np.zeros(b.shape) for b in self.biases]
         nabla_w = [np.zeros(w.shape) for w in self.weights]
 
-        a = x
+        act = x
 
         zs = []
         zds = []
-        acts = []
+        acts = [x]
         for (b, w) in zip(self.biases, self.weights):
-            z = np.dot(w, a) + b
+            z = np.dot(w, act) + b
             zs.append(z)
 
             act = sigmoid(z)
@@ -41,18 +41,19 @@ class Network(object):
             zd = sigmoid_prime(z)
             zds.append(zd)
 
-        theta_n = (acts[-1] - y) * zds[-1]
-        thetas = [theta_n]
+        delta = (acts[-1] - y) * zds[-1]
+        # thetas = [theta_n]
 
-        nabla_b[-1] = theta_n
-        nabla_w[-1] = np.dot(theta_n, acts[-2].transpose())
+        nabla_b[-1] = delta
+        nabla_w[-1] = np.dot(delta, acts[-2].transpose())
 
         for l in xrange(2, self.num_layers):
-            theta = np.dot(self.weights[-l + 1].transpose(), thetas[-l + 1]) * zds[-l]
-            thetas[-l] = theta
+            delta = np.dot(self.weights[-l + 1].transpose(), delta) * zds[-l]
+            # thetas[-l] = theta
 
-            nabla_b[-l] = theta
-            nabla_w[-l] = np.dot(theta, acts[-l - 1].transpose())
+            nabla_b[-l] = delta
+            tmp = np.dot(delta, acts[-l - 1].transpose())
+            nabla_w[-l] = tmp
 
 
         return (nabla_b, nabla_w)
@@ -108,7 +109,8 @@ def cost_derivate(output_activation, y):
 def run():
     training_data, validation_data, test_data = mnist_loader.load_data_wrapper()
     net = Network([784, 30, 10])
-    net.SGD(training_data, 30, 10, 3.0, test_data)
+    # net.SGD(training_data, 30, 10, 3.0, test_data)
+    net.SGD(training_data, 1, 1, 3.0, test_data)
 
 
 if __name__ == "__main__":
